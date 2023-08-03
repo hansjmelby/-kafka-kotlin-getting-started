@@ -13,6 +13,7 @@ data class OrdreStatusEndret (val ordreID:Int, val kundeID:String, val status:Or
 
 data class KundeStatusEndret (val kundeID:String, val status:KundeStatus?)
 
+data class ProduktDto(val id:String,val navn:String,val pris:Double,var rabatt:Double)
 
 enum class OrdreStatus(){
     REGISTRERT,
