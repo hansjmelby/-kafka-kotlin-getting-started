@@ -1,0 +1,57 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+
+
+cloud {
+  [ConfluentCloud]
+}
+
+
+'https://plantuml.com/component-diagram
+
+
+package "Kunde" {
+  kunde_HTTP <-- [Rest modul]
+
+  [Kunde_kafkamodul] - [Rest modul]
+  [Kunde_kafkamodul] -down-> [ConfluentCloud] :KundeOpprettet
+  [Kunde_kafkamodul] -down-> [db-kunde]
+
+}
+
+
+package "shipping" {
+  shipping_HTTP <-- [shipping_Rest modul]
+
+  [shipping_kafkamodul] - [shipping_Rest modul]
+  [shipping_kafkamodul] -up-> [ConfluentCloud] : OrdreSendt
+  [shipping_kafkamodul] <-up- [ConfluentCloud] : KundeOpprettet
+  [shipping_kafkamodul] -down- [shipping-db]
+
+}
+
+package "pris" {
+  pris_HTTP <-- [pris_Rest modul] : HentProduktPris
+
+  [pris_kafkamodul] - [pris_Rest modul]
+  [pris_kafkamodul] <-right- [ConfluentCloud] : KundeFlyttet
+  [pris_kafkamodul] <-right- [ConfluentCloud] : KundeOpprettet
+  [pris_kafkamodul] -down- [db-pris]
+
+
+}
+package "Folkeregisteret"{
+
+  [internModul] -up-> [ConfluentCloud] :PersonDød
+
+}
+
+database "db-kunde" {
+}
+database "db-pris" {
+}
+database "shipping-db" {
+}
+
+@enduml
