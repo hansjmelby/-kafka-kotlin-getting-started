@@ -37,6 +37,9 @@ fun Routing.priceRoutes(userRepo: MutableMap<String, KundeStatus>,produktRepo:Mu
             if (userRepo.containsKey(person_Id)){
                 kundeStatus = userRepo.get(person_Id)!!
             }
+            else{
+                logger.info { "Ingen kunde med kunde id $person_Id funnet i pris databasen. Defaulter til Kundestatus:  ${KundeStatus.STANDARD.name}" }
+            }
             if (!produktRepo.containsKey(produkt_Id)){
                 call.respond(HttpStatusCode.NotFound,  "Produkt ikke funnet")
             }
@@ -63,5 +66,5 @@ fun kalkulerRabatt(produktDto: ProduktDto, kundeStatus: KundeStatus) :Double{
         KundeStatus.DODGY ->  return produktDto.pris*-2
         KundeStatus.DOD -> return return 0.0
     }
-    return produktDto.pris
+    return 0.0
 }
