@@ -21,6 +21,12 @@ fun loadConfig(configFile:String): Properties {
     return properties
 
 }
+fun loadLensesConfig(): Properties {
+    val properties = Properties()
+    properties.put("bootstrap.servers","127.0.0.1:9092")
+    return properties
+
+}
 
 class GenericKafkaConsumer(val file:String, val topics:List<String>, val service: IHandleRecords,val consumerID:String){
     val consumer = createConsumer(consumerID)

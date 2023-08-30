@@ -76,6 +76,9 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
 
+    //Streams dependencies
+    implementation("org.apache.kafka:kafka-streams:3.5.1")
+
 }
 
 tasks {
