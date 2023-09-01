@@ -16,7 +16,9 @@ fun main(){
     val produser = createLensesProducer()
     while (true){
         val gadget =Gadget(color = picColor(),id= (1..10).random().toString(),temp=(10..30).random(),)
-        sendMessageOfTypeTekst(produser,"gadgets_input", UUID.randomUUID().toString(), objectMapper.writeValueAsString(gadget))
+        sendMessageOfTypeTekst(produser,"gadgets_input", gadget.id, objectMapper.writeValueAsString(gadget))
+        sendMessageOfTypeTekst(produser,"word-count-input", gadget.id, "One Two Three")
+        sendMessageOfTypeTekst(produser,"word-count-input", gadget.id, "One Blind mouse")
         println("gadget created")
         Thread.sleep(1000)
     }

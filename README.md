@@ -28,3 +28,7 @@ klassen MonolothApplication starer en "monolitt" som innholder alle tjenester og
 Dersom det er ønskelig å ha flere microtjenester så kan man taa utgangspunkt i MonolothApplication og kommentere ut alt utenom en tjeneste, samt endre port nummer dersom man skal kjøre opp tjenestene lokalt samtidig
 
 Klassen AppProduser er en klasse som er ment å simulere en verdikjede på kafka og kan brukes til å trigge hendelser på kafka
+
+
+Dersom du vil starte egen kafka instans (lokalt) kan du gjøre det via docker :
+docker run -e ADV_HOST=127.0.0.1 -e EULA="https://licenses.lenses.io/d/?id=b8467e70-4729-11ee-8f1e-42010af01003" --rm -p 3030:3030 -p 9092:9092 lensesio/box:latest
