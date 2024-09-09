@@ -20,14 +20,12 @@ fun loadProduceConfig(configFile:String): Properties {
 }
 
 class KafkaMessageProducer(val file:String,val clientID:String){
-    val producer = createProducer()
+    val producer = createProducer(file,clientID)
     private val logger = KotlinLogging.logger { }
 
 
-    fun createProducer(): KafkaProducer<String, String> {
-        val props = loadProduceConfig("client.properties")
-        props[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
-        props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
+    fun createProducer(file:String = "client.properties",clientID: String): KafkaProducer<String, String> {
+        val props = loadProduceConfig(file)
         props[ProducerConfig.CLIENT_ID_CONFIG] = clientID
 
         return KafkaProducer(props)

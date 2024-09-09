@@ -1,5 +1,5 @@
 val ktorVersion = "2.1.3"
-val kafkaVersion = "3.3.1"
+val kafkaVersion = "7.5.2-ccs"
 val jacksonVersion = "2.14.0"
 val konfigVersion = "1.6.10.0"
 val kotlinLoggerVersion = "1.8.3"
@@ -16,6 +16,7 @@ plugins {
     kotlin("jvm") version "1.7.10"
     application
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.davidmc24.gradle.plugin.avro") version "1.5.0"  // Correct Avro Gradle Plugin
 }
 
 group = "no.cx.workshop"
@@ -26,6 +27,7 @@ repositories {
     maven("https://packages.confluent.io/maven/")
     maven("https://jitpack.io")
 }
+
 
 dependencies {
     implementation(kotlin("stdlib"))
@@ -54,6 +56,12 @@ dependencies {
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-json:$ktorVersion")
     implementation("org.apache.httpcomponents:httpclient:$httpClientVersion")
+    // AVRO SPESIFIC
+    implementation("io.confluent:kafka-avro-serializer:5.0.0")
+    implementation("io.confluent:kafka-streams-avro-serde:7.0.0")
+
+    // --END AVRO---
+
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.7.0")
     implementation("io.ktor:ktor-server-metrics-micrometer-jvm:2.1.2")
@@ -76,9 +84,19 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
 
+    implementation("dk.tbsalling:aismessages:3.3.2")
+    implementation("dk.tbsalling:aisutils:1.0.0")
+
+
     //Streams dependencies
     implementation("org.apache.kafka:kafka-streams:3.5.1")
 
+}
+
+avro {
+    //outputDir.set(file("src/main/kotlin"))  // Directory for generated Java classes
+    isCreateSetters.set(true)  // Optional: Generate setters
+    stringType.set("String")  // Set Avro strings to use Java String type
 }
 
 tasks {
