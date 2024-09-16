@@ -87,6 +87,7 @@ dependencies {
     implementation("dk.tbsalling:aismessages:3.3.2")
     implementation("dk.tbsalling:aisutils:1.0.0")
 
+    implementation("dk.dma.ais.lib:ais-lib-messages:2.8.4")
 
     //Streams dependencies
     implementation("org.apache.kafka:kafka-streams:3.5.1")
@@ -97,6 +98,17 @@ avro {
     //outputDir.set(file("src/main/kotlin"))  // Directory for generated Java classes
     isCreateSetters.set(true)  // Optional: Generate setters
     stringType.set("String")  // Set Avro strings to use Java String type
+}
+
+tasks.register<Exec>("fetchAvroSchema") {
+    val schemaUrl = "http://localhost:8081/subjects/nyc_yellow_taxi_trip_data-value/versions/latest"
+    val schemaFile = file("src/main/avro/nyc_yellow_taxi_trip.avsc")
+
+    commandLine("curl", "-X", "GET", schemaUrl, "-o", schemaFile.absolutePath)
+}
+
+tasks.named("build") {
+    dependsOn("fetchAvroSchema")
 }
 
 tasks {
