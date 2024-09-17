@@ -25,13 +25,13 @@ class GadgetDeserializer : Deserializer<Gadget> {
 
 
 // Custom Serializer and Deserializer for PurchaseEvent (for simplicity)
-class PurchaseEventSerializer : org.apache.kafka.common.serialization.Serializer<PurchaseEvent> {
+class PurchaseEventSerializer : Serializer<PurchaseEvent> {
     override fun serialize(topic: String?, data: PurchaseEvent?): ByteArray? {
         return data?.let { "${it.category},${it.amount}".toByteArray() }
     }
 }
 
-class PurchaseEventDeserializer : org.apache.kafka.common.serialization.Deserializer<PurchaseEvent> {
+class PurchaseEventDeserializer : Deserializer<PurchaseEvent> {
     override fun deserialize(topic: String?, data: ByteArray?): PurchaseEvent? {
         return data?.let {
             val fields = String(it).split(",")
@@ -70,4 +70,28 @@ class CountAndSumDeserializer : Deserializer<CountAndSum> {
         val count = buffer.long
         return CountAndSum(sum, count)
     }
+}
+
+class BankTransactionSerializer : Serializer<BankTransaction> {
+    override fun serialize(topic: String?, data: BankTransaction?): ByteArray? {
+        if (data == null) return null
+        return jsonMapper.writeValueAsBytes(data)
+    }
+
+}
+class BankTransactionDeserializer : Deserializer<BankTransaction> {
+    override fun deserialize(topic: String?, data: ByteArray?): BankTransaction? {
+        if (data == null) return null
+        return jsonMapper.readValue(data, BankTransaction::class.java)
+    }
+
+}
+
+class BankTransactionSumSerde : Serde<BankTransaction> {
+    private val serializer = BankTransactionSerializer()
+    private val deserializer = BankTransactionDeserializer()
+
+    override fun serializer(): Serializer<BankTransaction> = serializer
+
+    override fun deserializer(): Deserializer<BankTransaction> = deserializer
 }

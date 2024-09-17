@@ -32,7 +32,10 @@ fun main() {
     props[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
     props[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] ="org.apache.kafka.common.serialization.Serdes\$StringSerde"
     props[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = "org.apache.kafka.common.serialization.Serdes\$StringSerde"
-
+    /*
+    * Add this to enable exaclly once
+    props[StreamsConfig.PROCESSING_GUARANTEE_CONFIG] = StreamsConfig.EXACTLY_ONCE_V2
+    */
     val builder = StreamsBuilder()
 
     val purchaseEventSerde = Serdes.serdeFrom(PurchaseEventSerializer(), PurchaseEventDeserializer())
@@ -40,6 +43,10 @@ fun main() {
     // Source topic: where we read the purchase events from
     val purchaseStream: KStream<String, PurchaseEvent> =
         builder.stream("purchase-events", Consumed.with(Serdes.String(), purchaseEventSerde))
+    /*
+    * if you want to debug
+    * */
+    purchaseStream.peek { key, value ->  println("key = $key value = ${value.toString()}")}
 
     // Group by category field
     val groupedByCategory: KGroupedStream<String, PurchaseEvent> = purchaseStream
@@ -158,12 +165,4 @@ fun main() {
             }
         }
     }.start(wait = true)
-}
-
-fun materialized(): Any {
-return ""
-}
-
-fun agregator() {
-
 }
