@@ -55,7 +55,7 @@ fun main() {
 
     // Define initializer for the aggregation (start with sum = 0 and count = 0)
     val initializer: () -> CountAndSum = { CountAndSum(0, 0) }
-
+    //Define agregate function
     val countAndSumAgregator: (String, PurchaseEvent, CountAndSum) -> CountAndSum = { _, event, aggregate ->
         CountAndSum(
             sum = aggregate.sum + event.amount.toLong(),
