@@ -11,14 +11,17 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StoreQueryParameters
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.*
+import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.apache.kafka.streams.state.Stores
+import java.time.Duration
 import java.util.*
 
 
@@ -48,6 +51,24 @@ fun main() {
             Materialized.`as`<String, Long>(Stores.inMemoryKeyValueStore("category-count-store"))
             .withKeySerde(Serdes.String())
             .withValueSerde(Serdes.Long()))
+
+
+    // Define initializer for the aggregation (start with sum = 0 and count = 0)
+    val initializer: () -> CountAndSum = { CountAndSum(0, 0) }
+
+    val countAndSumAgregator: (String, PurchaseEvent, CountAndSum) -> CountAndSum = { _, event, aggregate ->
+        CountAndSum(
+            sum = aggregate.sum + event.amount.toLong(),
+            count = aggregate.count + 1
+        )
+    }
+    val countandSumStream = groupedByCategory.aggregate(
+        initializer,
+        countAndSumAgregator,
+        Materialized.`as`<String, CountAndSum, KeyValueStore<Bytes, ByteArray>>("purchase-aggregates-store")
+            .withKeySerde(Serdes.String())
+            .withValueSerde(CountAndSumSerde())
+    )
 
     // Output the counts to a topic
     categoryCounts.toStream().to("category-counts", Produced.with(Serdes.String(), Serdes.Long()))
@@ -94,6 +115,27 @@ fun main() {
                     }
                 }
             }
+            get("/category-agregates") {
+
+                    // Query the store for the category count
+                    val store: ReadOnlyKeyValueStore<String, CountAndSum> = streams
+                        .store(
+                            StoreQueryParameters.fromNameAndType(
+                                "purchase-aggregates-store",
+                                QueryableStoreTypes.keyValueStore<String, CountAndSum>()
+                            )
+                        )
+
+                val allCounts = mutableMapOf<String, CountAndSum>()
+                store.all().use { iterator ->
+                    while (iterator.hasNext()) {
+                        val entry = iterator.next()
+                        allCounts[entry.key] = entry.value
+                    }
+                }
+                call.respond(allCounts)
+                }
+
 
             // List all categories and counts
             get("/category-counts") {
@@ -116,4 +158,12 @@ fun main() {
             }
         }
     }.start(wait = true)
+}
+
+fun materialized(): Any {
+return ""
+}
+
+fun agregator() {
+
 }
